@@ -58,9 +58,13 @@ void readNew(struct doublebuffer* db, void** resbuf, size_t* datalen){
         pthread_cond_wait(&(db->newdata_signal), &(db->db_lock_rd));
     }
     if (db->lastwrite){
-        memcpy(resbuf, db->bufb, datalen);
+        *resbuf = malloc(db->bufb_len);
+        memcpy(*resbuf, db->bufb, db->bufb_len);
+        *datalen = db->bufb_len;
     } else {
-        memcpy(resbuf, db->bufa, datalen);
+        *resbuf = malloc(db->bufa_len);
+        memcpy(*resbuf, db->bufa, db->bufa_len);
+        *datalen = db->bufa_len;
     }
     db->newdata = 0;
     pthread_mutex_unlock(&(db->db_lock_rd));
