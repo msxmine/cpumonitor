@@ -1,6 +1,7 @@
 #include "analyzer.h"
 #include "procstat.h"
 #include "doublebuf.h"
+#include "ringbuffer.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -27,6 +28,7 @@ struct system_stats previous_stats;
 struct system_stats current_stats;
 
 struct doublebuffer* recvpipe;
+struct ringbuffer* outpipe;
 int received = 0;
 
 void recvBuf(){
@@ -43,8 +45,13 @@ void recvBuf(){
     received++;
 }
 
-void initAnalyzer(struct doublebuffer* recv){
+void sendData(struct system_results* sr){
+    ringBufferWrite(outpipe, sr);
+}
+
+void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out){
     recvpipe = recv;
+    outpipe = out;
 }
 
 void destroyAnalyzer(){
@@ -59,8 +66,9 @@ void processAnalyzer(){
         printf("cores %d %d\n", coresnum, previous_stats.num_cores);
         struct core_results* results = malloc(sizeof(struct core_results)*coresnum);
         analyze(&current_stats, &previous_stats, results, coresnum);
-        for (int i = 0; i < coresnum; i++){
-            printf("%f\n", results[i].usage_percent);
-        }
+        struct system_results* sr = malloc(sizeof(struct system_results));
+        sr->num_cores = coresnum;
+        sr->data = results;
+        sendData(sr);
     }
 }

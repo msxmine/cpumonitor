@@ -1,4 +1,5 @@
 #include "doublebuf.h"
+#include "ringbuffer.h"
 
 struct core_results {
     int core_id;
@@ -11,5 +12,5 @@ struct system_results {
 };
 
 
-void initAnalyzer(struct doublebuffer* recv);
+void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out);
 void processAnalyzer();
