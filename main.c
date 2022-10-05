@@ -3,6 +3,7 @@
 #include "analyzer.h"
 #include "printer.h"
 #include "ringbuffer.h"
+#include "threadmanager.h"
 #include <unistd.h>
 #include <stdio.h>
 
@@ -13,11 +14,15 @@ int main(){
     initAnalyzer(&db, &rb);
     initPrinter(&rb);
 
+    create_thread(processReader);
+    create_thread(processAnalyzer);
+    create_thread(processPrinter);
+
     for(int i = 0; i < 99; i++){
-        processReader();
-        processAnalyzer();
+        //processReader();
+        //processAnalyzer();
         if (i > 3){
-        processPrinter();
+        //processPrinter();
         }
         sleep(1);
     }
