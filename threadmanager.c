@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include "threadmanager.h"
 
 struct thread_info {
     pthread_t thr;
@@ -12,7 +13,7 @@ struct thread_info {
 
 
 
-struct thread_info* registered_threads = NULL;
+struct thread_info** registered_threads = NULL;
 int num_registered = 0;
 
 void* threadloop(void* ti_v){
@@ -25,10 +26,11 @@ void* threadloop(void* ti_v){
 }
 
 void create_thread(void (*inner_function)(void)){
-    registered_threads = realloc(registered_threads, sizeof(struct thread_info)*(num_registered+1));
-    registered_threads[num_registered].inner_function = inner_function;
-    pthread_create(&(registered_threads[num_registered].thr), NULL, threadloop, (void*)&(registered_threads[num_registered]));
-    clock_gettime(CLOCK_MONOTONIC, &(registered_threads[num_registered].last_wd_kick));
+    registered_threads = realloc(registered_threads, sizeof(struct thread_info*)*(num_registered+1));
+    registered_threads[num_registered] = malloc(sizeof(struct thread_info));
+    registered_threads[num_registered]->inner_function = inner_function;
+    pthread_create(&(registered_threads[num_registered]->thr), NULL, threadloop, (void*)(registered_threads[num_registered]));
+    clock_gettime(CLOCK_MONOTONIC, &(registered_threads[num_registered]->last_wd_kick));
     num_registered++;
 
 
@@ -51,7 +53,7 @@ void* watchdog(void* arg){
     for (int i = 0; i < num_registered; i++){
         struct timespec now;
         clock_gettime(CLOCK_MONOTONIC, &now);
-        struct timespec delta = get_delta_time(&(registered_threads[i].last_wd_kick), &now);
+        struct timespec delta = get_delta_time(&(registered_threads[i]->last_wd_kick), &now);
         if (delta.tv_sec > 2){
             printf("thread failed\n");
         }
@@ -73,9 +75,9 @@ void hello(){
     cleep++;
 }
 
-
+/*
 int main(){
     create_thread(hello);
     start_wd();
     sleep(99);
-}
+}*/
