@@ -10,6 +10,30 @@ struct ringbuffer {
     pthread_mutex_t rb_lock;
 };
 
+void ringBufferWrite(struct ringbuffer* rb, void* dpointer){
+    pthread_mutex_lock(&(rb->rb_lock));
+    while(((rb->write_idx+1)%(rb->dlen)) == (rb->read_idx)){
+        pthread_cond_wait(&(rb->data_change), &(rb->rb_lock));
+    }
+    rb->data[rb->write_idx] = dpointer;
+    rb->write_idx = (rb->write_idx+1)%(rb->dlen);
+    pthread_cond_signal(&(rb->data_change));
+    pthread_mutex_unlock(&(rb->rb_lock));
+}
+
+void* ringBufferRead(struct ringbuffer* rb){
+    pthread_mutex_lock(&(rb->rb_lock));
+    while(rb->write_idx == rb->read_idx){
+        pthread_cond_wait(&(rb->data_change), &(rb->rb_lock));
+    }
+    void* ret = rb->data[rb->read_idx];
+    rb->read_idx = (rb->read_idx+1)%(rb->dlen);
+
+    pthread_cond_signal(&(rb->data_change));
+    pthread_mutex_unlock(&(rb->rb_lock));
+    return ret;
+}
+
 struct ringbuffer newRingBuffer(){
     struct ringbuffer ret;
     ret.data = malloc(sizeof(void*)*200);
@@ -23,4 +47,6 @@ struct ringbuffer newRingBuffer(){
 
 void destroyRingBuffer(struct ringbuffer* rb){
     free(rb->data);
+    pthread_cond_destroy(&(rb->data_change));
+    pthread_mutex_destroy(&(rb->rb_lock));
 }
