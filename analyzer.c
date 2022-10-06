@@ -21,6 +21,9 @@ void analyze(struct system_stats* in, struct system_stats* prev, struct core_res
         double core_prec = (double)(inttotal-intidle)/(double)(inttotal);
         out[cidx].core_id = cc->core_id;
         out[cidx].usage_percent = core_prec;
+        if (prevtotal == curtotal){
+            out[cidx].usage_percent = 0.0;
+        }
     }
 }
 
