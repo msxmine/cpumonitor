@@ -6,4 +6,5 @@ all:
 	gcc -c ringbuffer.c -g
 	gcc -c printer.c -g
 	gcc -c threadmanager.c -g
-	gcc main.o procreader.o analyzer.o doublebuf.o ringbuffer.o printer.o threadmanager.o -pthread -g
+	gcc -c logger.c -g
+	gcc main.o procreader.o analyzer.o doublebuf.o ringbuffer.o printer.o threadmanager.o logger.o -pthread -g
