@@ -14,7 +14,7 @@ struct timespec get_delta_time(struct timespec* start, struct timespec* end){
 
 struct timespec get_time_in_future(int sec){
     struct timespec res;
-    clock_gettime(CLOCK_MONOTONIC, &res);
+    clock_gettime(CLOCK_REALTIME, &res);
     res.tv_sec += sec;
     return res;
 }

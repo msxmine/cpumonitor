@@ -48,5 +48,5 @@ void processReader(){
     writeBuf(sendpipe, cpudata.cores, sizeof(struct core_stats)*cpudata.num_cores);
     printf("sending data\n");
     free(cpudata.cores);
-    sleep(1);
+    //sleep(1);
 }
