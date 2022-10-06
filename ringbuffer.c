@@ -14,7 +14,7 @@ void rbWaitForUnlock(struct ringbuffer* rb, int timeout){
 }
 
 int ringBufferWrite(struct ringbuffer* rb, void* dpointer){
-    ringBufferWriteTimed(rb, dpointer, 0);
+    return ringBufferWriteTimed(rb, dpointer, 0);
 }
 
 int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout){
@@ -34,7 +34,7 @@ int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout){
 }
 
 void* ringBufferRead(struct ringbuffer* rb){
-    ringBufferReadTimed(rb, 0);
+    return ringBufferReadTimed(rb, 0);
 }
 
 void* ringBufferReadTimed(struct ringbuffer* rb, int timeout){
