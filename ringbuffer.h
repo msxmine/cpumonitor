@@ -10,10 +10,15 @@ struct ringbuffer {
     size_t write_idx;
     pthread_cond_t data_change;
     pthread_mutex_t rb_lock;
+    int closed;
 };
 
-void ringBufferWrite(struct ringbuffer* rb, void* dpointer);
+int ringBufferWrite(struct ringbuffer* rb, void* dpointer);
+int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout);
 void* ringBufferRead(struct ringbuffer* rb);
+void* ringBufferReadTimed(struct ringbuffer* rb, int timeout);
 struct ringbuffer newRingBuffer();
-void destroyRingBuffer(struct ringbuffer* rb);
+void destroyRingBuffer(struct ringbuffer* rb, void (*cleanup_function)(void*));
+void closeRingBuffer(struct ringbuffer* rb);
+
 

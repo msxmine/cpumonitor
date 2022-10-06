@@ -11,7 +11,7 @@ void initLogger(){
 }
 
 void destroyLogger(){
-    destroyRingBuffer(&logbuffer);
+    destroyRingBuffer(&logbuffer, free);
 }
 
 void processLogger(){
