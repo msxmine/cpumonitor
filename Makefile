@@ -7,4 +7,5 @@ all:
 	gcc -c printer.c -g
 	gcc -c threadmanager.c -g
 	gcc -c logger.c -g
-	gcc main.o procreader.o analyzer.o doublebuf.o ringbuffer.o printer.o threadmanager.o logger.o -pthread -g
+	gcc -c timeutils.c -g
+	gcc main.o procreader.o analyzer.o doublebuf.o ringbuffer.o printer.o threadmanager.o logger.o timeutils.o -pthread -g
