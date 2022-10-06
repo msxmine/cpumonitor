@@ -63,7 +63,7 @@ void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out){
 }
 
 void destroyAnalyzer(){
-
+    destroyBuffer(recvpipe);
 }
 
 void processAnalyzer(){

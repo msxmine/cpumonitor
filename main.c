@@ -30,4 +30,11 @@ int main(){
 
     joinThreads();
 
+
+    destroyReader();
+    destroyAnalyzer();
+    destroyPrinter();
+    destroyLogger();
+
+
 }

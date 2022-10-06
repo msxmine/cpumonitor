@@ -14,3 +14,4 @@ struct system_results {
 
 void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out);
 void processAnalyzer();
+void destroyAnalyzer();
