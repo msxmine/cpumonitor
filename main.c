@@ -31,15 +31,18 @@ int main(){
     initPrinter(&rb);
     initLogger();
 
-    create_thread(processReader, 1);
-    create_thread(processAnalyzer,0);
-    create_thread(processPrinter,0);
-    create_thread(processLogger,0);
-
     sigset_t waitonsigs;
     sigemptyset(&waitonsigs);
     sigaddset(&waitonsigs, SIGTERM);
     sigaddset(&waitonsigs, SIGINT);
+
+    pthread_sigmask(SIG_BLOCK, &waitonsigs, NULL);
+    create_thread(processReader, 1, "Reader");
+    create_thread(processAnalyzer,0, "Analyzer");
+    create_thread(processPrinter,0, "Printer");
+    create_thread(processLogger,0, "Logger");
+    create_thread(watchdog, 1, "Watchdog");
+    pthread_sigmask(SIG_UNBLOCK, &waitonsigs, NULL);
 
     int recvsignum;
     sigwait(&waitonsigs, &recvsignum);
