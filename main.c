@@ -4,6 +4,7 @@
 #include "printer.h"
 #include "ringbuffer.h"
 #include "threadmanager.h"
+#include "logger.h"
 #include <unistd.h>
 #include <stdio.h>
 
@@ -13,10 +14,12 @@ int main(){
     initReader("./hello", &db);
     initAnalyzer(&db, &rb);
     initPrinter(&rb);
+    initLogger();
 
     create_thread(processReader);
     create_thread(processAnalyzer);
     create_thread(processPrinter);
+    create_thread(processLogger);
 
     for(int i = 0; i < 99; i++){
         //processReader();
@@ -26,4 +29,6 @@ int main(){
         }
         sleep(1);
     }
+    closeLogger();
+    
 }

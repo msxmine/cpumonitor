@@ -10,12 +10,19 @@ void initLogger(){
     logbuffer = newRingBuffer();
 }
 
+void closeLogger(){
+    closeRingBuffer(&logbuffer);
+}
+
 void destroyLogger(){
     destroyRingBuffer(&logbuffer, free);
 }
 
 void processLogger(){
-    char* msg = (char*)ringBufferRead(&logbuffer);
+    char* msg = (char*)ringBufferReadTimed(&logbuffer, 1);
+    if (msg == NULL){
+        return;
+    }
     printf("%s", msg);
     free(msg);
 }
@@ -24,5 +31,7 @@ void dlog(char* msg){
     size_t msglen = strlen(msg);
     char* msgcopy = malloc(sizeof(char)*(msglen+1));
     memcpy(msgcopy, msg, (msglen+1));
-    ringBufferWrite(&logbuffer, msgcopy);
+    if (ringBufferWrite(&logbuffer, msgcopy)){
+        free(msgcopy);
+    }
 }

@@ -46,7 +46,10 @@ void recvBuf(){
 }
 
 void sendData(struct system_results* sr){
-    ringBufferWrite(outpipe, sr);
+    if (ringBufferWrite(outpipe, sr)){
+        free(sr->data);
+        free(sr);
+    }
 }
 
 void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out){
