@@ -75,3 +75,13 @@ void joinThreads(){
         pthread_join(registered_threads[i]->thr, NULL);
     }
 }
+
+
+void destroyThreadManager(){
+    pthread_cond_destroy(&loop_thread_signal);
+    for (int i = 0; i < num_registered; i++){
+        pthread_mutex_destroy(&(registered_threads[i]->thrlock));
+        free(registered_threads[i]);
+    }
+    free(registered_threads);
+}

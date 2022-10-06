@@ -59,6 +59,6 @@ int main(){
     destroyAnalyzer();
     destroyPrinter();
     destroyLogger();
-
+    destroyThreadManager();
 
 }

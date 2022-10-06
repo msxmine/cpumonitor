@@ -67,6 +67,12 @@ void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out){
 
 void destroyAnalyzer(){
     destroyBuffer(recvpipe);
+    if(previous_stats.cores != NULL){
+        free(previous_stats.cores);
+    }
+    if(current_stats.cores != NULL){
+        free(current_stats.cores);
+    }
 }
 
 void processAnalyzer(){
