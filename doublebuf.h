@@ -16,9 +16,12 @@ struct doublebuffer {
     pthread_mutex_t bufb_lock;
     pthread_mutex_t db_lock_rd;
     pthread_mutex_t db_lock_wr;
+    int closed;
 };
 
-void writeBuf(struct doublebuffer* db, void* databuf, size_t datalen);
-void readNew(struct doublebuffer* db, void** resbuf, size_t* datalen);
+int writeBuf(struct doublebuffer* db, void* databuf, size_t datalen);
+int readNew(struct doublebuffer* db, void** resbuf, size_t* datalen);
+int readNewTimed(struct doublebuffer* db, void** resbuf, size_t* datalen, int timeout);
 struct doublebuffer newBuffer();
 void destroyBuffer(struct doublebuffer* db);
+void closeBuffer(struct doublebuffer* db);
