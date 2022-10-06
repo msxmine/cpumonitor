@@ -3,13 +3,15 @@
 #include <time.h>
 #include "ringbuffer.h"
 #include "timeutils.h"
+#include <errno.h>
 
-void rbWaitForUnlock(struct ringbuffer* rb, int timeout){
+int rbWaitForUnlock(struct ringbuffer* rb, int timeout){
     if (timeout == 0){
         pthread_cond_wait(&(rb->data_change), &(rb->rb_lock));
+        return 0;
     } else {
         struct timespec ts = get_time_in_future(timeout);
-        pthread_cond_timedwait(&(rb->data_change), &(rb->rb_lock), &ts);
+        return pthread_cond_timedwait(&(rb->data_change), &(rb->rb_lock), &ts) == ETIMEDOUT ? 1 : 0;
     }
 }
 
@@ -20,11 +22,10 @@ int ringBufferWrite(struct ringbuffer* rb, void* dpointer){
 int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout){
     pthread_mutex_lock(&(rb->rb_lock));
     while(((rb->write_idx+1)%(rb->dlen)) == (rb->read_idx) || rb->closed){
-        if (rb->closed){
+        if (rb->closed || rbWaitForUnlock(rb, timeout)){
             pthread_mutex_unlock(&(rb->rb_lock));
             return 1;
         }
-        rbWaitForUnlock(rb, timeout);
     }
     rb->data[rb->write_idx] = dpointer;
     rb->write_idx = (rb->write_idx+1)%(rb->dlen);
@@ -40,11 +41,10 @@ void* ringBufferRead(struct ringbuffer* rb){
 void* ringBufferReadTimed(struct ringbuffer* rb, int timeout){
     pthread_mutex_lock(&(rb->rb_lock));
     while(rb->write_idx == rb->read_idx || rb->closed){
-        if (rb->closed){
+        if (rb->closed || rbWaitForUnlock(rb, timeout)){
             pthread_mutex_unlock(&(rb->rb_lock));
             return NULL;
         }
-        rbWaitForUnlock(rb, timeout);
     }
     void* ret = rb->data[rb->read_idx];
     rb->read_idx = (rb->read_idx+1)%(rb->dlen);

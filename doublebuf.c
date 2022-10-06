@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 int writeBuf(struct doublebuffer* db, void* databuf, size_t datalen){
     if (db->closed){
@@ -51,18 +52,22 @@ int readNew(struct doublebuffer* db, void** resbuf, size_t* datalen){
     return readNewTimed(db, resbuf, datalen, 0);
 }
 
+int dbWaitForUnlock(struct doublebuffer* db, int timeout){
+    if (timeout == 0){
+        pthread_cond_wait(&(db->newdata_signal), &(db->db_lock_rd));
+        return 0;
+    } else {
+        struct timespec ts = get_time_in_future(timeout);
+        return pthread_cond_timedwait(&(db->newdata_signal), &(db->db_lock_rd), &ts) == ETIMEDOUT ? 1 : 0;
+    }
+}
+
 int readNewTimed(struct doublebuffer* db, void** resbuf, size_t* datalen, int timeout){
     pthread_mutex_lock(&(db->db_lock_rd));
     while (!(db->newdata) || db->closed){
-        if (db->closed){
+        if (db->closed || dbWaitForUnlock(db, timeout)){
             pthread_mutex_unlock(&(db->db_lock_rd));
             return 1;
-        }
-        if (timeout == 0){
-            pthread_cond_wait(&(db->newdata_signal), &(db->db_lock_rd));
-        } else {
-            struct timespec ts = get_time_in_future(timeout);
-            pthread_cond_timedwait(&(db->newdata_signal), &(db->db_lock_rd), &ts);
         }
     }
     if (db->lastwrite){
