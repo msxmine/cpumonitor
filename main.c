@@ -21,14 +21,13 @@ int main(){
     create_thread(processPrinter);
     create_thread(processLogger);
 
-    for(int i = 0; i < 99; i++){
-        //processReader();
-        //processAnalyzer();
-        if (i > 3){
-        //processPrinter();
-        }
-        sleep(1);
-    }
+    sleep(5);
+
+    exitThreads();
+    closeBuffer(&db);
+    closeRingBuffer(&rb);
     closeLogger();
-    
+
+    joinThreads();
+
 }

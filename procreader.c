@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int readProc(FILE* fil, struct system_stats* result){
     if (fil == NULL){
@@ -47,4 +48,5 @@ void processReader(){
     writeBuf(sendpipe, cpudata.cores, sizeof(struct core_stats)*cpudata.num_cores);
     printf("sending data\n");
     free(cpudata.cores);
+    sleep(1);
 }

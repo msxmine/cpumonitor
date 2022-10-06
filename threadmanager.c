@@ -16,14 +16,16 @@ struct thread_info {
 
 struct thread_info** registered_threads = NULL;
 int num_registered = 0;
+int thread_manager_exit = 0;
 
 void* threadloop(void* ti_v){
     struct thread_info* ti = (struct thread_info*)(ti_v);
-    while(1){
+    while(!thread_manager_exit){
     (ti->inner_function)();
-    sleep(1);
+    //sleep(1);
     clock_gettime(CLOCK_MONOTONIC, &(ti->last_wd_kick));
     }
+    printf("thread end\n");
 }
 
 void create_thread(void (*inner_function)(void)){
@@ -63,6 +65,16 @@ void hello(){
     printf("Hello\n");
     sleep(cleep);
     cleep++;
+}
+
+void exitThreads(){
+    thread_manager_exit = 1;
+}
+
+void joinThreads(){
+    for (int i = 0; i < num_registered; i++){
+        pthread_join(registered_threads[i]->thr, NULL);
+    }
 }
 
 /*
