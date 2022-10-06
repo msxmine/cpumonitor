@@ -31,18 +31,23 @@ struct doublebuffer* recvpipe;
 struct ringbuffer* outpipe;
 int received = 0;
 
-void recvBuf(){
+int recvBuf(){
+    size_t bufsize;
+    void* recvdata;
+    if (readNewTimed(recvpipe, &recvdata, &bufsize,1)){
+        return 1;
+    }
+
     if (previous_stats.cores != NULL){
         free(previous_stats.cores);
     }
     previous_stats = current_stats;
-    size_t bufsize;
-    void* recvdata;
-    readNew(recvpipe, &recvdata, &bufsize);
+
     current_stats.num_cores = bufsize / sizeof(struct core_stats);
     printf("received cores %d\n", current_stats.num_cores);
     current_stats.cores = (struct core_stats*)recvdata;
     received++;
+    return 0;
 }
 
 void sendData(struct system_results* sr){
@@ -62,7 +67,10 @@ void destroyAnalyzer(){
 }
 
 void processAnalyzer(){
-    recvBuf();
+    printf("processing anaalyzer\n");
+    if (recvBuf()){
+        return;
+    }
     printf("receiving\n");
     if (received > 1){
         int coresnum = current_stats.num_cores;
