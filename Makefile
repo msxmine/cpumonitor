@@ -1,6 +1,7 @@
 #CC=clang
-#CFLAGS=-g -Weverything -Wno-padded -Wno-declaration-after-statement -Wno-disabled-macro-expansion
-CFLAGS=-g
+#CFLAGS=-g -Weverything -Wno-padded -Wno-declaration-after-statement -Wno-disabled-macro-expansion -Wno-format-nonliteral
+#CC=gcc
+#CFLAGS=-g -Wall -Wextra
 
 ODIR=obj
 LIBS=-pthread
@@ -16,6 +17,8 @@ cpumonitor: $(ODIR)/main.o $(OBJ)
 
 test: $(ODIR)/test.o $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+all: cpumonitor test
 
 .PHONY: clean
 clean:
