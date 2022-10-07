@@ -1,11 +1,14 @@
-all:
-	gcc -c procreader.c -pthread -g
-	gcc -c analyzer.c -pthread -g
-	gcc -c main.c -pthread -g
-	gcc -c doublebuf.c -pthread -g
-	gcc -c ringbuffer.c -g
-	gcc -c printer.c -g
-	gcc -c threadmanager.c -g
-	gcc -c logger.c -g
-	gcc -c timeutils.c -g
-	gcc main.o procreader.o analyzer.o doublebuf.o ringbuffer.o printer.o threadmanager.o logger.o timeutils.o -pthread -g
+CC=gcc
+CFLAGS=-g
+
+ODIR=obj
+LIBS=-pthread
+
+_OBJ = main.o procreader.o analyzer.o doublebuf.o ringbuffer.o printer.o threadmanager.o logger.o timeutils.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+$(ODIR)/%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+cpumonitor: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
