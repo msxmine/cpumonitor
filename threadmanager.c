@@ -34,6 +34,7 @@ void* threadloop(void* ti_v){
     }
     printf("thread end\n");
     pthread_mutex_unlock(&(ti->thrlock));
+    return NULL;
 }
 
 void create_thread(void (*inner_function)(void), int loopdelay, char* name){

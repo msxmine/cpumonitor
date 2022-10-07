@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g
+CFLAGS=-g -Wall -Wextra
 
 ODIR=obj
 LIBS=-pthread
@@ -12,3 +12,7 @@ $(ODIR)/%.o: %.c
 
 cpumonitor: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+clean:
+	rm ./$(ODIR)/*.o

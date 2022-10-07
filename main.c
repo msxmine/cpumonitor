@@ -13,7 +13,9 @@
 int exit_signal_raised = 0;
 
 void sighandler(int signum){
-    exit_signal_raised = 1;
+    if (signum == SIGTERM || signum == SIGINT){
+        exit_signal_raised = 1;
+    }
 }
 
 int main(){
@@ -26,7 +28,7 @@ int main(){
 
     struct doublebuffer db = newBuffer();
     struct ringbuffer rb = newRingBuffer();
-    initReader("./hello", &db);
+    initReader("/proc/stat", &db);
     initAnalyzer(&db, &rb);
     initPrinter(&rb);
     initLogger();
