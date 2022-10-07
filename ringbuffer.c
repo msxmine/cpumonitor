@@ -7,7 +7,7 @@
 
 //Simple synchronized ringbuffer
 static int rbWaitForUnlock(struct ringbuffer* rb, int timeout){
-    if (timeout == 0){
+    if (timeout == -1){
         pthread_cond_wait(&(rb->data_change), &(rb->rb_lock));
         return 0;
     } else {
@@ -17,7 +17,7 @@ static int rbWaitForUnlock(struct ringbuffer* rb, int timeout){
 }
 
 int ringBufferWrite(struct ringbuffer* rb, void* dpointer){
-    return ringBufferWriteTimed(rb, dpointer, 0);
+    return ringBufferWriteTimed(rb, dpointer, -1);
 }
 
 int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout){
@@ -36,7 +36,7 @@ int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout){
 }
 
 void* ringBufferRead(struct ringbuffer* rb){
-    return ringBufferReadTimed(rb, 0);
+    return ringBufferReadTimed(rb, -1);
 }
 
 void* ringBufferReadTimed(struct ringbuffer* rb, int timeout){

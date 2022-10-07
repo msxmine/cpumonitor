@@ -50,11 +50,11 @@ int writeBuf(struct doublebuffer* db, void* databuf, size_t datalen){
 }
 
 int readNew(struct doublebuffer* db, void** resbuf, size_t* datalen){
-    return readNewTimed(db, resbuf, datalen, 0);
+    return readNewTimed(db, resbuf, datalen, -1);
 }
 
 static int dbWaitForUnlock(struct doublebuffer* db, int timeout){
-    if (timeout == 0){
+    if (timeout == -1){
         pthread_cond_wait(&(db->newdata_signal), &(db->db_lock_rd));
         return 0;
     } else {
