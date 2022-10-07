@@ -9,7 +9,7 @@
 #include "logger.h"
 
 //Read cpu data from kernel
-static int readProc(FILE* fil, struct system_stats* result){
+int readProc(FILE* fil, struct system_stats* result){
     if (fil == NULL){
         return 1;
     }

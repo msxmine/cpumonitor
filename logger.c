@@ -9,6 +9,7 @@
 static struct ringbuffer logbuffer;
 static FILE* outfile;
 static pthread_mutex_t flock;
+static int loggerReady = 0;
 
 static void printout(char msg[]){
     pthread_mutex_lock(&flock);
@@ -29,6 +30,7 @@ void initLogger(char path[]){
     if (outfile == NULL){
         outfile = fopen("/dev/stderr", "w");
     }
+    loggerReady = 1;
 }
 
 void closeLogger(void){
@@ -53,6 +55,9 @@ void processLogger(void){
 }
 //Main logging function
 void dlog(const char* format, ...){
+    if (!loggerReady){
+        return;
+    }
     va_list args;
     va_start(args, format);
 

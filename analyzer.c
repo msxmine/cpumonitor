@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 //Convert 2 linux jiffie readings into average load
-static void analyze(struct system_stats* in, struct system_stats* prev, struct core_results* out, unsigned int num_cores){
+void analyze(struct system_stats* in, struct system_stats* prev, struct core_results* out, unsigned int num_cores){
     for (unsigned int cidx = 0; cidx < num_cores; cidx++){
         struct core_stats* pc = &(prev->cores[cidx]);
         struct core_stats* cc = &(in->cores[cidx]);
