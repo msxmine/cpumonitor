@@ -51,7 +51,7 @@ void processLogger(void){
     printout(msg);
     free(msg);
 }
-
+//Main logging function
 void dlog(const char* format, ...){
     va_list args;
     va_start(args, format);

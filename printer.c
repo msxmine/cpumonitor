@@ -13,8 +13,10 @@ static void system_results_free(void* sr){
 }
 
 static void printResults(struct system_results* sr){
+    printf("\x1b[2J"); //Clear screen
+    printf("\x1b[H"); //Move cursor to upper-left
     for(unsigned int i = 0; i < sr->num_cores; i++){
-        printf("CPU %d : %f\n", sr->data[i].core_id, sr->data[i].usage_percent);
+        printf("CPU %4d : %5.1f%%\n", sr->data[i].core_id, (sr->data[i].usage_percent)*100.0);
     }
 }
 
