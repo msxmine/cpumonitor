@@ -22,6 +22,6 @@ struct doublebuffer {
 int writeBuf(struct doublebuffer* db, void* databuf, size_t datalen);
 int readNew(struct doublebuffer* db, void** resbuf, size_t* datalen);
 int readNewTimed(struct doublebuffer* db, void** resbuf, size_t* datalen, int timeout);
-struct doublebuffer newBuffer();
+struct doublebuffer newBuffer(void);
 void destroyBuffer(struct doublebuffer* db);
 void closeBuffer(struct doublebuffer* db);

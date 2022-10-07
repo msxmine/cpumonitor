@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 
-int readProc(FILE* fil, struct system_stats* result){
+static int readProc(FILE* fil, struct system_stats* result){
     if (fil == NULL){
         return 1;
     }
@@ -18,7 +18,7 @@ int readProc(FILE* fil, struct system_stats* result){
     size_t linelen = 0;
     while(getline(&linebuf, &linelen, fil) != -1){
         if (strlen(linebuf) > 4 && memcmp(linebuf, "cpu", 3) == 0 && linebuf[3] != ' '){
-            result->cores = realloc(result->cores, sizeof(struct core_stats)*(result->num_cores+1));
+            result->cores = realloc(result->cores, sizeof(struct core_stats)*(result->num_cores+1u));
             struct core_stats* target = &(result->cores[result->num_cores]);
             sscanf(linebuf+3, "%d %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64 " %" SCNd64, 
                                                                                     &(target->core_id), &(target->user), &(target->nice), &(target->system), &(target->idle),
@@ -30,19 +30,19 @@ int readProc(FILE* fil, struct system_stats* result){
     return 0;
 }
 
-FILE* myFile;
-struct doublebuffer* sendpipe;
+static FILE* myFile;
+static struct doublebuffer* sendpipe;
 
 void initReader(char path[], struct doublebuffer* send){
     myFile = fopen(path, "r");
     sendpipe = send;
 }
 
-void destroyReader(){
+void destroyReader(void){
     fclose(myFile);
 }
 
-void processReader(){
+void processReader(void){
     struct system_stats cpudata;
     cpudata.cores = NULL;
     cpudata.num_cores = 0;

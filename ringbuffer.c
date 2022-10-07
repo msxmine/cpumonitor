@@ -5,7 +5,7 @@
 #include "timeutils.h"
 #include <errno.h>
 
-int rbWaitForUnlock(struct ringbuffer* rb, int timeout){
+static int rbWaitForUnlock(struct ringbuffer* rb, int timeout){
     if (timeout == 0){
         pthread_cond_wait(&(rb->data_change), &(rb->rb_lock));
         return 0;
@@ -54,7 +54,7 @@ void* ringBufferReadTimed(struct ringbuffer* rb, int timeout){
     return ret;
 }
 
-struct ringbuffer newRingBuffer(){
+struct ringbuffer newRingBuffer(void){
     struct ringbuffer ret;
     ret.data = malloc(sizeof(void*)*200);
     ret.dlen = 200;

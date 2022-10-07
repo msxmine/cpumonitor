@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-g -Wall -Wextra
+CC=clang
+CFLAGS=-g -Weverything -Wno-padded -Wno-declaration-after-statement -Wno-disabled-macro-expansion
 
 ODIR=obj
 LIBS=-pthread

@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void analyze(struct system_stats* in, struct system_stats* prev, struct core_results* out, int num_cores){
-    for (int cidx = 0; cidx < num_cores; cidx++){
+static void analyze(struct system_stats* in, struct system_stats* prev, struct core_results* out, unsigned int num_cores){
+    for (unsigned int cidx = 0; cidx < num_cores; cidx++){
         struct core_stats* pc = &(prev->cores[cidx]);
         struct core_stats* cc = &(in->cores[cidx]);
         uint64_t previdle = (pc->idle + pc->iowait);
@@ -27,14 +27,14 @@ void analyze(struct system_stats* in, struct system_stats* prev, struct core_res
     }
 }
 
-struct system_stats previous_stats;
-struct system_stats current_stats;
+static struct system_stats previous_stats;
+static struct system_stats current_stats;
 
-struct doublebuffer* recvpipe;
-struct ringbuffer* outpipe;
-int received = 0;
+static struct doublebuffer* recvpipe;
+static struct ringbuffer* outpipe;
+static int received = 0;
 
-int recvBuf(){
+static int recvBuf(void){
     size_t bufsize;
     void* recvdata;
     if (readNewTimed(recvpipe, &recvdata, &bufsize,1)){
@@ -46,14 +46,14 @@ int recvBuf(){
     }
     previous_stats = current_stats;
 
-    current_stats.num_cores = bufsize / sizeof(struct core_stats);
+    current_stats.num_cores = (unsigned int)(bufsize / sizeof(struct core_stats));
     printf("received cores %d\n", current_stats.num_cores);
     current_stats.cores = (struct core_stats*)recvdata;
     received++;
     return 0;
 }
 
-void sendData(struct system_results* sr){
+static void sendData(struct system_results* sr){
     if (ringBufferWrite(outpipe, sr)){
         free(sr->data);
         free(sr);
@@ -65,7 +65,7 @@ void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out){
     outpipe = out;
 }
 
-void destroyAnalyzer(){
+void destroyAnalyzer(void){
     destroyBuffer(recvpipe);
     if(previous_stats.cores != NULL){
         free(previous_stats.cores);
@@ -75,14 +75,14 @@ void destroyAnalyzer(){
     }
 }
 
-void processAnalyzer(){
+void processAnalyzer(void){
     printf("processing anaalyzer\n");
     if (recvBuf()){
         return;
     }
     printf("receiving\n");
     if (received > 1){
-        int coresnum = current_stats.num_cores;
+        unsigned int coresnum = current_stats.num_cores;
         printf("cores %d %d\n", coresnum, previous_stats.num_cores);
         struct core_results* results = malloc(sizeof(struct core_results)*coresnum);
         analyze(&current_stats, &previous_stats, results, coresnum);

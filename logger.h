@@ -1,7 +1,7 @@
 #pragma once
 
-void initLogger();
-void closeLogger();
-void destroyLogger();
-void processLogger();
+void initLogger(void);
+void closeLogger(void);
+void destroyLogger(void);
+void processLogger(void);
 void dlog(char* msg);

@@ -52,7 +52,7 @@ int readNew(struct doublebuffer* db, void** resbuf, size_t* datalen){
     return readNewTimed(db, resbuf, datalen, 0);
 }
 
-int dbWaitForUnlock(struct doublebuffer* db, int timeout){
+static int dbWaitForUnlock(struct doublebuffer* db, int timeout){
     if (timeout == 0){
         pthread_cond_wait(&(db->newdata_signal), &(db->db_lock_rd));
         return 0;
@@ -90,7 +90,7 @@ int readNewTimed(struct doublebuffer* db, void** resbuf, size_t* datalen, int ti
     return 0;
 }
 
-struct doublebuffer newBuffer(){
+struct doublebuffer newBuffer(void){
     struct doublebuffer ret;
     ret.bufa = NULL;
     ret.bufb = NULL;

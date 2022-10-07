@@ -4,21 +4,21 @@
 #include <string.h>
 #include "logger.h"
 
-struct ringbuffer logbuffer;
+static struct ringbuffer logbuffer;
 
-void initLogger(){
+void initLogger(void){
     logbuffer = newRingBuffer();
 }
 
-void closeLogger(){
+void closeLogger(void){
     closeRingBuffer(&logbuffer);
 }
 
-void destroyLogger(){
+void destroyLogger(void){
     destroyRingBuffer(&logbuffer, free);
 }
 
-void processLogger(){
+void processLogger(void){
     char* msg = (char*)ringBufferReadTimed(&logbuffer, 1);
     if (msg == NULL){
         return;

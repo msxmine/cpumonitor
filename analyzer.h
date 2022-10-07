@@ -7,11 +7,11 @@ struct core_results {
 };
 
 struct system_results {
-    int num_cores;
+    unsigned int num_cores;
     struct core_results* data;
 };
 
 
 void initAnalyzer(struct doublebuffer* recv, struct ringbuffer* out);
-void processAnalyzer();
-void destroyAnalyzer();
+void processAnalyzer(void);
+void destroyAnalyzer(void);

@@ -17,7 +17,7 @@ int ringBufferWrite(struct ringbuffer* rb, void* dpointer);
 int ringBufferWriteTimed(struct ringbuffer* rb, void* dpointer, int timeout);
 void* ringBufferRead(struct ringbuffer* rb);
 void* ringBufferReadTimed(struct ringbuffer* rb, int timeout);
-struct ringbuffer newRingBuffer();
+struct ringbuffer newRingBuffer(void);
 void destroyRingBuffer(struct ringbuffer* rb, void (*cleanup_function)(void*));
 void closeRingBuffer(struct ringbuffer* rb);
 

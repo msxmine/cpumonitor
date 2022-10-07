@@ -17,13 +17,13 @@ struct thread_info {
 };
 
 
-struct thread_info** registered_threads = NULL;
-pthread_cond_t loop_thread_signal;
-int num_registered = 0;
-int thread_manager_exit = 0;
-pthread_t lastparrent;
+static struct thread_info** registered_threads = NULL;
+static pthread_cond_t loop_thread_signal;
+static unsigned int num_registered = 0;
+static int thread_manager_exit = 0;
+static pthread_t lastparrent;
 
-void* threadloop(void* ti_v){
+static void* threadloop(void* ti_v){
     struct thread_info* ti = (struct thread_info*)(ti_v);
     pthread_mutex_lock(&(ti->thrlock));
     while(!thread_manager_exit){
@@ -54,8 +54,8 @@ void create_thread(void (*inner_function)(void), int loopdelay, char* name){
 
 }
 
-void watchdog(){
-    for (int i = 0; i < num_registered; i++){
+void watchdog(void){
+    for (unsigned int i = 0; i < num_registered; i++){
         struct timespec now;
         clock_gettime(CLOCK_MONOTONIC, &now);
         struct timespec delta = get_delta_time(&(registered_threads[i]->last_wd_kick), &now);
@@ -66,21 +66,21 @@ void watchdog(){
     }
 }
 
-void exitThreads(){
+void exitThreads(void){
     thread_manager_exit = 1;
 }
 
-void joinThreads(){
+void joinThreads(void){
     pthread_cond_broadcast(&loop_thread_signal);
-    for (int i = 0; i < num_registered; i++){
+    for (unsigned int i = 0; i < num_registered; i++){
         pthread_join(registered_threads[i]->thr, NULL);
     }
 }
 
 
-void destroyThreadManager(){
+void destroyThreadManager(void){
     pthread_cond_destroy(&loop_thread_signal);
-    for (int i = 0; i < num_registered; i++){
+    for (unsigned int i = 0; i < num_registered; i++){
         pthread_mutex_destroy(&(registered_threads[i]->thrlock));
         free(registered_threads[i]);
     }

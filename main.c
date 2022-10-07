@@ -10,15 +10,15 @@
 #include <signal.h>
 #include <string.h>
 
-int exit_signal_raised = 0;
+static int exit_signal_raised = 0;
 
-void sighandler(int signum){
+static void sighandler(int signum){
     if (signum == SIGTERM || signum == SIGINT){
         exit_signal_raised = 1;
     }
 }
 
-int main(){
+int main(void){
     struct sigaction exithandler;
     memset(&exithandler, 0, sizeof(struct sigaction));
     exithandler.sa_handler = sighandler;

@@ -15,6 +15,6 @@ struct core_stats {
 };
 
 struct system_stats {
-    int num_cores;
+    unsigned int num_cores;
     struct core_stats* cores;
 };
