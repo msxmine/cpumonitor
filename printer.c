@@ -1,6 +1,7 @@
 #include "analyzer.h"
 #include "ringbuffer.h"
 #include "printer.h"
+#include "logger.h"
 #include <stdio.h>
 
 
@@ -26,7 +27,7 @@ void destroyPrinter(void){
 }
 
 void processPrinter(void){
-    printf("processing printer\n");
+    dlog("processing printer\n");
     struct system_results* recres = (struct system_results*)(ringBufferReadTimed(recvpipe_printr, 1));
     if (recres != NULL){
         printResults(recres);

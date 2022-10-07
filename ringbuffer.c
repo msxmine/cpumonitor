@@ -5,6 +5,7 @@
 #include "timeutils.h"
 #include <errno.h>
 
+//Simple synchronized ringbuffer
 static int rbWaitForUnlock(struct ringbuffer* rb, int timeout){
     if (timeout == 0){
         pthread_cond_wait(&(rb->data_change), &(rb->rb_lock));

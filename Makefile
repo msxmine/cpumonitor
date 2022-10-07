@@ -1,5 +1,5 @@
-CC=clang
-CFLAGS=-g -Weverything -Wno-padded -Wno-declaration-after-statement -Wno-disabled-macro-expansion
+#CC=clang
+#CFLAGS=-g -Weverything -Wno-padded -Wno-declaration-after-statement -Wno-disabled-macro-expansion
 
 ODIR=obj
 LIBS=-pthread
@@ -15,4 +15,4 @@ cpumonitor: $(OBJ)
 
 .PHONY: clean
 clean:
-	rm ./$(ODIR)/*.o
+	rm $(ODIR)/*.o

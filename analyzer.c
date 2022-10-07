@@ -2,10 +2,11 @@
 #include "procstat.h"
 #include "doublebuf.h"
 #include "ringbuffer.h"
+#include "logger.h"
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdio.h>
 
+//Convert 2 linux jiffie readings into average load
 static void analyze(struct system_stats* in, struct system_stats* prev, struct core_results* out, unsigned int num_cores){
     for (unsigned int cidx = 0; cidx < num_cores; cidx++){
         struct core_stats* pc = &(prev->cores[cidx]);
@@ -47,7 +48,7 @@ static int recvBuf(void){
     previous_stats = current_stats;
 
     current_stats.num_cores = (unsigned int)(bufsize / sizeof(struct core_stats));
-    printf("received cores %d\n", current_stats.num_cores);
+    dlog("received cores %d\n", current_stats.num_cores);
     current_stats.cores = (struct core_stats*)recvdata;
     received++;
     return 0;
@@ -76,14 +77,13 @@ void destroyAnalyzer(void){
 }
 
 void processAnalyzer(void){
-    printf("processing anaalyzer\n");
+    dlog("processing analyzer\n");
     if (recvBuf()){
         return;
     }
-    printf("receiving\n");
     if (received > 1){
         unsigned int coresnum = current_stats.num_cores;
-        printf("cores %d %d\n", coresnum, previous_stats.num_cores);
+        dlog("cores %d %d\n", coresnum, previous_stats.num_cores);
         struct core_results* results = malloc(sizeof(struct core_results)*coresnum);
         analyze(&current_stats, &previous_stats, results, coresnum);
         struct system_results* sr = malloc(sizeof(struct system_results));

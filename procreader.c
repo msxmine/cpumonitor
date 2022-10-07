@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <inttypes.h>
+#include "logger.h"
 
 static int readProc(FILE* fil, struct system_stats* result){
     if (fil == NULL){
@@ -48,7 +49,7 @@ void processReader(void){
     cpudata.num_cores = 0;
     readProc(myFile, &cpudata);
     writeBuf(sendpipe, cpudata.cores, sizeof(struct core_stats)*cpudata.num_cores);
-    printf("sending data\n");
+    dlog("sending kernel data\n");
     free(cpudata.cores);
     //sleep(1);
 }

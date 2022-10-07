@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "threadmanager.h"
 #include "timeutils.h"
+#include "logger.h"
 #include <time.h>
 #include <signal.h>
 
@@ -32,8 +33,8 @@ static void* threadloop(void* ti_v){
         pthread_cond_timedwait(&(loop_thread_signal), &(ti->thrlock), &ts);
         clock_gettime(CLOCK_MONOTONIC, &(ti->last_wd_kick));
     }
-    printf("thread end\n");
     pthread_mutex_unlock(&(ti->thrlock));
+    dlog("Thread %s finished loop\n", ti->thrname);
     return NULL;
 }
 
@@ -51,7 +52,7 @@ void create_thread(void (*inner_function)(void), int loopdelay, char* name){
     pthread_create(&(registered_threads[num_registered]->thr), NULL, threadloop, (void*)(registered_threads[num_registered]));
     clock_gettime(CLOCK_MONOTONIC, &(registered_threads[num_registered]->last_wd_kick));
     num_registered++;
-
+    dlog("Thread %s has been created\n", name);
 }
 
 void watchdog(void){
@@ -60,7 +61,8 @@ void watchdog(void){
         clock_gettime(CLOCK_MONOTONIC, &now);
         struct timespec delta = get_delta_time(&(registered_threads[i]->last_wd_kick), &now);
         if (delta.tv_sec > 2){
-            printf("thread %s failed\n", registered_threads[i]->thrname);
+            printf("Terminating (Watchdog fail)\n");
+            dlog("Thread %s failed\n", registered_threads[i]->thrname);
             pthread_kill(lastparrent, SIGTERM);
         }
     }
@@ -74,6 +76,7 @@ void joinThreads(void){
     pthread_cond_broadcast(&loop_thread_signal);
     for (unsigned int i = 0; i < num_registered; i++){
         pthread_join(registered_threads[i]->thr, NULL);
+        dlog("Thread %s joined\n", registered_threads[i]->thrname);
     }
 }
 

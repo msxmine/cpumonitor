@@ -2,12 +2,33 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
+#include <pthread.h>
 #include "logger.h"
 
 static struct ringbuffer logbuffer;
+static FILE* outfile;
+static pthread_mutex_t flock;
 
-void initLogger(void){
+static void printout(char msg[]){
+    pthread_mutex_lock(&flock);
+    if (outfile != NULL){
+        fprintf(outfile, "%s", msg);
+    }
+    pthread_mutex_unlock(&flock);
+}
+
+static void printAndFree(void* str){
+    printout((char*)str);
+    free(str);
+}
+
+void initLogger(char path[]){
     logbuffer = newRingBuffer();
+    outfile = fopen(path, "w");
+    if (outfile == NULL){
+        outfile = fopen("/dev/stderr", "w");
+    }
 }
 
 void closeLogger(void){
@@ -15,7 +36,11 @@ void closeLogger(void){
 }
 
 void destroyLogger(void){
-    destroyRingBuffer(&logbuffer, free);
+    destroyRingBuffer(&logbuffer, printAndFree);
+    pthread_mutex_lock(&flock);
+    fclose(outfile);
+    outfile = NULL;
+    pthread_mutex_unlock(&flock);
 }
 
 void processLogger(void){
@@ -23,15 +48,20 @@ void processLogger(void){
     if (msg == NULL){
         return;
     }
-    printf("%s", msg);
+    printout(msg);
     free(msg);
 }
 
-void dlog(char* msg){
-    size_t msglen = strlen(msg);
-    char* msgcopy = malloc(sizeof(char)*(msglen+1));
-    memcpy(msgcopy, msg, (msglen+1));
+void dlog(const char* format, ...){
+    va_list args;
+    va_start(args, format);
+
+    char* msgcopy = malloc(sizeof(char)*1024);
+    vsnprintf(msgcopy, 1024, format, args);
+
     if (ringBufferWrite(&logbuffer, msgcopy)){
+        //Closing fallback
+        printout(msgcopy);
         free(msgcopy);
     }
 }

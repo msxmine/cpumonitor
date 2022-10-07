@@ -31,7 +31,7 @@ int main(void){
     initReader("/proc/stat", &db);
     initAnalyzer(&db, &rb);
     initPrinter(&rb);
-    initLogger();
+    initLogger("./devlog.txt");
 
     sigset_t waitonsigs;
     sigemptyset(&waitonsigs);

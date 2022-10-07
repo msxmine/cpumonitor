@@ -1,11 +1,12 @@
 #include "doublebuf.h"
 #include "timeutils.h"
+#include "logger.h"
 #include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
 
+//Write into an unlocked slot (with oldest data if not locked)
 int writeBuf(struct doublebuffer* db, void* databuf, size_t datalen){
     if (db->closed){
         return 1;
@@ -32,13 +33,13 @@ int writeBuf(struct doublebuffer* db, void* databuf, size_t datalen){
         db->bufa = realloc(db->bufa, datalen);
         memcpy(db->bufa, databuf, datalen);
         db->bufa_len = datalen;
-        printf("writing a\n");
+        dlog("writing a\n");
         pthread_mutex_unlock(&(db->bufa_lock));
     } else {
         db->bufb = realloc(db->bufb, datalen);
         memcpy(db->bufb, databuf, datalen);
         db->bufb_len = datalen;
-        printf("writing b\n");
+        dlog("writing b\n");
         pthread_mutex_unlock(&(db->bufb_lock));
     }
     db->lastwrite = lockedbuf;
@@ -62,6 +63,7 @@ static int dbWaitForUnlock(struct doublebuffer* db, int timeout){
     }
 }
 
+//Lock and read most recent complete slot
 int readNewTimed(struct doublebuffer* db, void** resbuf, size_t* datalen, int timeout){
     pthread_mutex_lock(&(db->db_lock_rd));
     while (!(db->newdata) || db->closed){
@@ -75,14 +77,14 @@ int readNewTimed(struct doublebuffer* db, void** resbuf, size_t* datalen, int ti
         *resbuf = malloc(db->bufb_len);
         memcpy(*resbuf, db->bufb, db->bufb_len);
         *datalen = db->bufb_len;
-        printf("reading b\n");
+        dlog("reading b\n");
         pthread_mutex_unlock(&(db->bufb_lock));
     } else {
         pthread_mutex_lock(&(db->bufa_lock));
         *resbuf = malloc(db->bufa_len);
         memcpy(*resbuf, db->bufa, db->bufa_len);
         *datalen = db->bufa_len;
-        printf("reading a\n");
+        dlog("reading a\n");
         pthread_mutex_unlock(&(db->bufa_lock));
     }
     db->newdata = 0;
